@@ -3,6 +3,7 @@
 #include"functions.h"
 
 int main(){
+    printf("GIT teste\n");
     char row[100]; 
     scanf("%[^\n]",row);
     char func = row[0];
