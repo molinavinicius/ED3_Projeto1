@@ -1,0 +1,12 @@
+
+Leia ATENTAMENTE abaixo:
+
+- Aqui encontram-se todos os casos de teste disponíveis no run.codes para este trabalho.
+- Eles estão organizados já na devida ordem (caso 1, 2, ...).
+- Arquivos do tipo *.in e *.out representam respectivamente a entrada e saída esperadas no run.codes.
+- Arquivos do tipo *.bin, *.csv e *.index são usados pelo seu programa durante a execução.
+- Nos casos em que a funcionalidade modifica arquivos (inserção, atualização, ...), os arquivos terminados em "-antes" são aqueles antes da execução do programa, enquanto que os terminados em "-depois" são o resultado após execução do programa.
+- Tome MUITO cuidado ao utilizar o Windows para programar! É recomendado utilizar o WSL (Windows Subsystem for Linux) ou um sistema Linux nativo.
+- Os comandos ensinados em aulas anteriores (man, valgrind, hexdump, meld) serão muito úteis para debugar ou testar seu trabalho.
+- Recomenda-se testar em seu computador usando esses arquivos e o terminal. Por exemplo, para executar o caso de teste 1, entre com a linha de comando: ./nomeDoProgramaCompilado < caso1.in
+

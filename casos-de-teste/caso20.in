@@ -1,0 +1,11 @@
+5 caso20.bin caso20.index 10
+idPessoa 2000 1 nomePessoa "Angela"
+nomePessoa NULO 1 idadePessoa 40
+idPessoa 30 1 nomePessoa "Elizabeth Woolridge Grant Norman F Rockwell"
+idadePessoa 30 2 nomePessoa NULO idadePessoa 30
+idPessoa 140 1 idPessoa 999
+idadePessoa -1 1 nomePessoa "Joao da Silva"
+twitterPessoa "pabllovittar" 3 idPessoa 119 nomePessoa "Yukeee" idadePessoa 25
+nomePessoa NULO 1 idadePessoa 30
+nomePessoa NULO 1 nomePessoa "Fulano"
+idPessoa 20 1 nomePessoa NULO
