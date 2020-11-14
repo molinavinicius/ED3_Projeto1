@@ -3,7 +3,7 @@
 #include"functions.h"
 
 int main(){
-    printf("GIT teste\n");
+
     char row[100]; 
     scanf("%[^\n]",row);
     char func = row[0];
@@ -14,6 +14,7 @@ int main(){
     char indexa[25];
     char field[25];
     char value[40];
+    int n;
     
     switch (func){
         case '1':
@@ -28,14 +29,21 @@ int main(){
         
         case '3':
             sscanf(row, "%d %s %s %s %s", &opt, bin, indexa, field, value);
-            func3(bin, indexa, field, value);
+    
+            int* result = func3(bin, indexa, field, value);
+            int size = result[0];
+            for (int k=1; k<= size; k++){
+                printf("%d ", result[k]);
+            }
+            free(result);
             break;
         
         case '4':
             /* code */
             break;
         case '5':
-            /* code */
+            sscanf(row, "%d %s %s %d", &opt, bin, indexa, &n);
+            func5(bin, indexa, n);
             break;
 
         default:
