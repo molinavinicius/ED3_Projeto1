@@ -110,7 +110,6 @@ int insereListaOrdenado(Lista* list, Index ind){
 void writeFilled(FILE* fp, char* str, int SIZE, int lixo){
 	
 	char* string = (char*)malloc((SIZE+1)*sizeof(char));
-	trim(str);
 
     strcpy(string,str);
 	size_t prevlen = strlen(string);

@@ -87,6 +87,7 @@ int escreveRegistro(FILE* fp, Registro reg){
     fwrite(&reg.idPessoa, sizeof(int),1,fp);
     writeFilled(fp,reg.name,NAME_SIZE,0);
     fwrite(&reg.idade, sizeof(int),1,fp);
+	trim(reg.twitter);
     writeFilled(fp, reg.twitter, TWITTER_SIZE,0);
     return rrn;
 }
