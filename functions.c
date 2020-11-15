@@ -66,7 +66,7 @@ int alteraRegistro(FILE* fp, FILE* fi, int RRN, char* field, char* value){
     }else if(strcmp(field, "nomePessoa")==0){
 
         fseek(fp, RRN*REG_SIZE + 5, SEEK_SET);
-        fwrite(value, sizeof(char), 40, fp);
+        writeFilled(fp, value, NAME_SIZE, 0);
 
     }else if(strcmp(field, "idadePessoa")==0){
         int age = atoi(value);
@@ -76,46 +76,96 @@ int alteraRegistro(FILE* fp, FILE* fi, int RRN, char* field, char* value){
 
     }else if(strcmp(field, "twitterPessoa")==0){
         fseek(fp, RRN*REG_SIZE + 49, SEEK_SET);
-        fwrite(value, sizeof(char), 15, fp);
+        writeFilled(fp, value, TWITTER_SIZE, 0);
     }
     return OK;
 }
 
-int func1(char* csv){
-    printf("oi");
+int escreveRegistro(FILE* fp, Registro reg){
+
+    int rrn = ftell(fp)/REG_SIZE;
+    fwrite(&reg.removed,sizeof(char), 1, fp);
+    fwrite(&reg.idPessoa, sizeof(int),1,fp);
+    writeFilled(fp,reg.name,40,0);
+    fwrite(&reg.idade, sizeof(int),1,fp);
+    writeFilled(fp, reg.twitter, 15,0);
+    return rrn;
+}
+
+
+int func1(char* csv, char* file_bin, char* file_index){
+
     Registro* registros = (Registro *)calloc(10, sizeof(Registro*)); 
-    printf("oi1");
+
     FILE* csvFile = openfile(csv, "rb");
     if(csvFile == NULL){
         printf("Falha no processamento do arquivo.");
         return ERRO;
     }
 
-    printf("oi2");
-    char row[100];
-    char buffer[40];
-    char twitter[15];
-    int id;
-    int age;
+    FILE* fPessoa = openfile(file_bin, "wb");
+    if(fPessoa == NULL){
+        printf("Falha no processamento do arquivo.");
+        return ERRO;
+    }
 
-    int i = 0;
+    FILE* fIndex = openfile(file_index, "wb");
+    if(fIndex == NULL){
+        printf("Falha no processamento do arquivo.");
+        return ERRO;
+    }
+
+    //ESCREVE O CABEÇALHO------------
+    int qtdPessoas = 0;
+    char statusBin = '0';
+    char statusIndex = '0';
+    char lixo[59];
+    strcpy(lixo,"");
+
+    fwrite(&statusBin,sizeof(char),1,fPessoa);
+    fwrite(&qtdPessoas,sizeof(int),1,fPessoa);
+    writeFilled(fPessoa, lixo, 59, 1);
+
+    strcpy(lixo,"");
+    fwrite(&statusIndex,1,1,fIndex);
+    writeFilled(fIndex, lixo, 7, 1);
+    //---------------------------------
+
+    Lista* list = criaLista();  
+
+    Index ind;
+
+    char row[100];
+    char buffer[100];
+
     Registro reg;
-    fscanf(csvFile,"%*[^\r\n]%*c");
+    fgets (row, 100, csvFile);
+    fflush(stdin);
     while( fgets (row, 100, csvFile)!=NULL ) {
-        printf("%d",i);
         strcpy(buffer,"");
         int i = sscanf(row, "%d,%[^,],%d,%[^\n]", &reg.idPessoa, buffer,&reg.idade, reg.twitter);
+        if(strlen(buffer)>40){
+            buffer[40] = '\0';
+        }
         strcpy(reg.name, buffer);
         if (i < 4 ){
             sscanf(row, "%d,,%d,%s\n", &reg.idPessoa,&reg.idade,reg.twitter);
         }
-        registros[i] = reg;
-        i++;
-        if(i%9==0){
-            registros = realloc(registros, 2*i*sizeof(Registro));
-        }
+        reg.removed = '1';
+
+        ind.idPessoa = reg.idPessoa;
+        ind.rrn = escreveRegistro(fPessoa, reg);
+        insereListaOrdenado(list, ind);
     }
-    printf("%lu", sizeof(registros));
+    Index* p = *list; 
+    escreveLista(fIndex, list);
+
+
+    fclose(fPessoa);
+    fclose(fIndex);
+    liberaLista(list);
+
+    binarioNaTela1("casos-de-teste/teste.bin", "casos-de-teste/teste.index");
 
     return 0;
 }

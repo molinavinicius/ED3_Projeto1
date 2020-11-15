@@ -18,8 +18,8 @@ int main(){
     
     switch (func){
         case '1':
-            sscanf(row, "%d %s", &opt, csv);
-            func1(csv);
+            sscanf(row, "%d %s %s %s", &opt, csv, bin, indexa);
+            func1(csv, bin, indexa);
             break;
         
         case '2':
