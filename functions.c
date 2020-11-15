@@ -82,10 +82,12 @@ int alteraRegistro(FILE* fp, FILE* fi, int RRN, char* field, char* value){
 
 int escreveRegistro(FILE* fp, Registro reg){
 	
+	printf("IDADE: %d\n", reg.idade);
     int rrn = ftell(fp)/REG_SIZE;
     fwrite(&reg.removed,sizeof(char), 1, fp);
     fwrite(&reg.idPessoa, sizeof(int),1,fp);
     writeFilled(fp,reg.name,NAME_SIZE,0);
+	printf("IDADE1: %d\n\n", reg.idade);
     fwrite(&reg.idade, sizeof(int),1,fp);
     writeFilled(fp, reg.twitter, TWITTER_SIZE,0);
     return rrn;
@@ -100,13 +102,13 @@ int func1(char* csv, char* file_bin, char* file_index){
         return ERRO;
     }
 
-    FILE* fPessoa = openfile(file_bin, "wb");
+    FILE* fPessoa = openfile(file_bin, "wb+");
     if(fPessoa == NULL){
         printf("Falha no processamento do arquivo.");
         return ERRO;
     }
 
-    FILE* fIndex = openfile(file_index, "wb");
+    FILE* fIndex = openfile(file_index, "wb+");
     if(fIndex == NULL){
         printf("Falha no processamento do arquivo.");
         return ERRO;
