@@ -81,7 +81,6 @@ int alteraRegistro(FILE* fp, FILE* fi, int RRN, char* field, char* value){
 }
 
 int escreveRegistro(FILE* fp, Registro reg){
-	
     int rrn = ftell(fp)/REG_SIZE;
     fwrite(&reg.removed,sizeof(char), 1, fp);
     fwrite(&reg.idPessoa, sizeof(int),1,fp);
@@ -140,6 +139,9 @@ int func1(char* csv, char* file_bin, char* file_index){
     fgets (row, 100, csvFile);
     fflush(stdin);
     while( fgets (row, 100, csvFile)!=NULL ) {
+		reg.idPessoa = -1;
+		strcpy(reg.twitter, "");
+
         strcpy(buffer,"");
         int i = sscanf(row, "%d,%[^,],%d,%[^\n]", &reg.idPessoa, buffer,&reg.idade, reg.twitter);
         if(strlen(buffer)>=40){
@@ -149,7 +151,12 @@ int func1(char* csv, char* file_bin, char* file_index){
         if (i < 4 ){
             sscanf(row, "%d,,%d,%s\n", &reg.idPessoa,&reg.idade,reg.twitter);
         }
+
         reg.removed = '1';
+
+		if((reg.idPessoa == -1) || strcmp(reg.twitter,"")==0){
+			continue;
+		}
 
         ind.idPessoa = reg.idPessoa;
         ind.rrn = escreveRegistro(fPessoa, reg) - 1;
@@ -390,12 +397,16 @@ int func4(char* file_bin, char* file_index, int n){
     char buffer[100];
 
     for(int i=0; i<n;i++){
+
+		//Lê o novo ID;
         scanf("%d", &registro.idPessoa);
+		//Lê o nome;
         scan_quote_string(buffer);
-        if(strlen(buffer)>40){
-            buffer[40] = '\0';
+		if(strlen(buffer)>=40){
+            buffer[39] = '\0';
         }
         strcpy(registro.name, buffer);
+		//Lê a idade
         scan_quote_string(buff);
         if(strcmp(buff, "") == 0){
             registro.idade = -1;
@@ -403,6 +414,7 @@ int func4(char* file_bin, char* file_index, int n){
             registro.idade = atoi(buff);
         }
         scan_quote_string(registro.twitter);
+
         index.idPessoa = registro.idPessoa;
         index.rrn = escreveRegistro(fPessoa, registro) - 1;
         insereListaOrdenado(list, index);

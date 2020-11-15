@@ -219,7 +219,7 @@ FILE* openfile(char* filename, char* mode){
     strcpy(path, "casos-de-teste/");
     strcat(path, filename); 
 
-    FILE* file = fopen(filename, mode);
+    FILE* file = fopen(path, mode);
 
     free(path);
     return file;
