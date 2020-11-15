@@ -98,7 +98,7 @@ int func1(char* csv, char* file_bin, char* file_index){
 
     FILE* csvFile = openfile(csv, "rb");
     if(csvFile == NULL){
-        printf("Falha no processamento do arquivo.");
+        printf("Falha no carregamento do arquivo.");
         return ERRO;
     }
 
@@ -165,7 +165,7 @@ int func1(char* csv, char* file_bin, char* file_index){
     fclose(fIndex);
     liberaLista(list);
 
-    binarioNaTela1("casos-de-teste/teste.bin", "casos-de-teste/teste.index");
+    binarioNaTela1(file_bin, file_index);
 
     return 0;
 }
@@ -422,7 +422,7 @@ int func4(char* file_bin, char* file_index, int n){
     fclose(fPessoa);
     liberaLista(list);
 
-    binarioNaTela1("casos-de-teste/caso19-antes.bin", "casos-de-teste/caso19-antes.index");
+    binarioNaTela1(file_bin, file_index);
 
     return OK;
 }
@@ -484,6 +484,6 @@ int func5(char* file_bin, char* file_index, int n){
     changeStatus(fIndex, '1');
     fclose(fPessoa);
     fclose(fIndex);
-    //binarioNaTela1(file_bin, file_index);
+    binarioNaTela1(file_bin, file_index);
     return OK;
 }
