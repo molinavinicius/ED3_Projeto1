@@ -86,9 +86,9 @@ int escreveRegistro(FILE* fp, Registro reg){
     int rrn = ftell(fp)/REG_SIZE;
     fwrite(&reg.removed,sizeof(char), 1, fp);
     fwrite(&reg.idPessoa, sizeof(int),1,fp);
-    writeFilled(fp,reg.name,40,0);
+    writeFilled(fp,reg.name,NAME_SIZE,0);
     fwrite(&reg.idade, sizeof(int),1,fp);
-    writeFilled(fp, reg.twitter, 15,0);
+    writeFilled(fp, reg.twitter, TWITTER_SIZE,0);
     return rrn;
 }
 
@@ -156,10 +156,12 @@ int func1(char* csv, char* file_bin, char* file_index){
         ind.idPessoa = reg.idPessoa;
         ind.rrn = escreveRegistro(fPessoa, reg);
         insereListaOrdenado(list, ind);
+        qtdPessoas++;
     }
     Index* p = *list; 
     escreveLista(fIndex, list);
-
+    fseek(fPessoa,1,SEEK_SET);
+    fwrite(&qtdPessoas,sizeof(int),1,fPessoa);
 
     fclose(fPessoa);
     fclose(fIndex);
