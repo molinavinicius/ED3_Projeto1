@@ -142,7 +142,7 @@ int func1(char* csv, char* file_bin, char* file_index){
         strcpy(buffer,"");
         int i = sscanf(row, "%d,%[^,],%d,%[^\n]", &reg.idPessoa, buffer,&reg.idade, reg.twitter);
         if(strlen(buffer)>40){
-            buffer[40] = '\0';
+            buffer[39] = '\0';
         }
         strcpy(reg.name, buffer);
         if (i < 4 ){
