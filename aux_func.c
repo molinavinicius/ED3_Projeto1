@@ -81,7 +81,7 @@ void writeFilled(FILE* fp, char* str, int SIZE, int lixo){
     }else{
         *(str+prevlen) = '\0';
     }
-    memset(str + prevlen + 0, '$', SIZE - prevlen);
+    memset(str + prevlen + 1, '$', SIZE - prevlen);
     fwrite(str, 1, SIZE, fp);
 }
 
