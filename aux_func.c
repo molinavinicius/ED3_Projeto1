@@ -7,6 +7,85 @@
 #include "aux_func.h"
 
 
+Lista* criaLista(){
+    Lista* list = (Lista*)malloc(sizeof(Lista));
+    if(list != NULL)
+        *list = NULL;
+    return list;
+}
+
+void liberaLista(Lista* list){
+    if(list != NULL){
+        Index* i = *list;
+        while(i != NULL){
+            free(i);
+            i = i->prox;
+        }
+        free(list);
+    }
+}
+
+void escreveLista(FILE* fp,Lista *list){
+	Index *no = *list;
+	if(list == NULL)
+		return;
+	while (no != NULL){
+		fwrite(&no->idPessoa,sizeof(int),1,fp);
+        fwrite(&no->rrn,sizeof(int),1,fp);
+		no = no->prox;
+	}
+}
+
+int insereListaOrdenado(Lista* list, Index ind){
+    if(list == NULL)
+        return ERRO;
+    Index* i = (Index*)malloc(sizeof(i));
+    if(i == NULL)
+        return ERRO;
+    i->idPessoa = ind.idPessoa;
+    i->rrn = ind.rrn;
+
+    //caso a lista estiver vazia, inserir no inicio
+    if((*list) == NULL){
+        i->prox = NULL;
+        i->ant = NULL;
+        *list = i;
+        return OK;
+    }else{
+        Index* antes;
+        Index* atual = *list;
+        while(atual != NULL && atual->idPessoa < ind.idPessoa){
+            antes = atual;
+            atual = antes->prox;
+        }
+        if(atual == *list){
+            i->ant = NULL;
+            (*list)->ant = i;
+            i->prox = (*list);
+            (*list) = i;
+        }else{
+            i->prox = antes->prox;
+            i->ant = antes;
+            antes->prox = i;
+            if(atual != NULL){
+                atual->ant = i;
+            }
+        }
+        return OK;
+    }
+}
+
+void writeFilled(FILE* fp, char* str, int SIZE, int lixo){
+    size_t prevlen = strlen(str);
+    if(lixo == 1) {
+        *(str+prevlen) = '$';
+    }else{
+        *(str+prevlen) = '\0';
+    }
+    memset(str + prevlen + 1, '$', SIZE - prevlen);
+    fwrite(str, 1, SIZE, fp);
+}
+
 void remove_quotes(char * line){
     char *dst = line;
     char *src = line;
@@ -67,8 +146,6 @@ void scan_quote_string(char *str) {
 	}
 }
 
-
-
 FILE* openfile(char* filename, char* mode){
     char *path = (char *)malloc((strlen(filename)+16)*sizeof(char));
     strcpy(path, "casos-de-teste/");
@@ -95,12 +172,11 @@ int buscaBin(FILE* fp, int idPessoa){
         fseek(fp,8*middle, SEEK_SET);
         fread(&id, sizeof(int), 1,fp);
         fread(&RRN, sizeof(int), 1,fp);
-
         if (id == idPessoa){
             return RRN;
         }
         if (idPessoa > id){
-            left = middle;
+            left = middle+1;
         }else{
             right = middle;
         }

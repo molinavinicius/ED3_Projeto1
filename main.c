@@ -18,8 +18,8 @@ int main(){
     
     switch (func){
         case '1':
-            sscanf(row, "%d %s", &opt, csv);
-            func1(csv);
+            sscanf(row, "%d %s %s %s", &opt, csv, bin, indexa);
+            func1(csv, bin, indexa);
             break;
         
         case '2':
@@ -31,10 +31,6 @@ int main(){
             sscanf(row, "%d %s %s %s %s", &opt, bin, indexa, field, value);
     
             int* result = func3(bin, indexa, field, value,1);
-            int size = result[0];
-            for (int k=1; k<= size; k++){
-                printf("%d ", result[k]);
-            }
             free(result);
             break;
         
