@@ -67,14 +67,12 @@ void scan_quote_string(char *str) {
 	}
 }
 
-
-
 FILE* openfile(char* filename, char* mode){
     char *path = (char *)malloc((strlen(filename)+16)*sizeof(char));
     strcpy(path, "casos-de-teste/");
     strcat(path, filename); 
 
-    FILE* file = fopen(path, mode);
+    FILE* file = fopen(filename, mode);
 
     free(path);
     return file;
@@ -95,12 +93,11 @@ int buscaBin(FILE* fp, int idPessoa){
         fseek(fp,8*middle, SEEK_SET);
         fread(&id, sizeof(int), 1,fp);
         fread(&RRN, sizeof(int), 1,fp);
-
         if (id == idPessoa){
             return RRN;
         }
         if (idPessoa > id){
-            left = middle;
+            left = middle+1;
         }else{
             right = middle;
         }

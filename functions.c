@@ -9,7 +9,7 @@
 
 
 void printRegister( Registro registro){
-    printf("Dados da pessoa de codigo %d\n", registro.idPessoa);
+    printf("Dados da pessoa de código %d\n", registro.idPessoa);
     if (strlen(registro.name)){
         printf("Nome: %s\n", registro.name);
     }else{
@@ -49,10 +49,6 @@ void changeStatus(FILE* fp, char status){
 
 //TODO: adicionar os caracteres de lixo '$'
 int alteraRegistro(FILE* fp, FILE* fi, int RRN, char* field, char* value){
-    printf("\n--- VALORES EM ALTERA_REG ---\n");
-    printf("RRN: %d\n", RRN);
-    printf("FIELD: %s\n", field);
-    printf("VALUE: %s\n", value);
     if(strcmp(field, "idPessoa")==0){
         int id = atoi(value);
         int pos = buscaBin(fi, id);
@@ -181,27 +177,33 @@ int* func3(char *file_bin, char * file_index, char *field, char *value, int prin
   FILE *fPessoa = openfile(file_bin, "rb");
   if(fPessoa == NULL){
         printf("Falha no processamento do arquivo.");
-        exit(1);
+        exit(0);
     }
   FILE *fIndex = openfile(file_index, "rb");
-  if(fPessoa == NULL){
+  if(fIndex == NULL){
         printf("Falha no processamento do arquivo.");
-        exit(1);
+        exit(0);
     }
 
   fread(&header.status, sizeof(char), 1, fPessoa);
+  char statusIndex;
+  fread(&statusIndex, sizeof(char), 1, fIndex);
+  if(header.status == '0' || statusIndex == '0'){
+        printf("Falha no processamento do arquivo.");
+        exit(0);
+    }
   fread(&header.qtdPessoas, sizeof(int), 1, fPessoa);
   fseek(fPessoa, 59, SEEK_CUR);
 
   if(header.qtdPessoas == 0){
     printf("Registro inexistente.");
-    exit(1);
+    exit(0);
   }
 
   int *result = (int*)malloc(sizeof(int));
     if (result == NULL){
         printf("[FUNC3] Erro na alocação.");
-        exit(1);
+        exit(0);
     }
   int r = 1;
 
@@ -211,7 +213,7 @@ int* func3(char *file_bin, char * file_index, char *field, char *value, int prin
     int id = atoi(value);
     int RRN = buscaBin(fIndex, id);
     if (RRN == -1){
-        printf("Não encontrei");
+        printf("Registro inexistente.");
     }
     else{
         fseek(fPessoa, 64*(RRN+1),SEEK_SET);
@@ -223,7 +225,7 @@ int* func3(char *file_bin, char * file_index, char *field, char *value, int prin
             int* temp = realloc(result, (r++)*sizeof(int));
             if (temp == NULL){
                 printf("[FUNC3] Erro na realocação.");
-                exit(1);
+                exit(0);
             }
             result = temp;
         }else{
@@ -244,7 +246,7 @@ int* func3(char *file_bin, char * file_index, char *field, char *value, int prin
             int* temp = realloc(result, (r+2)*sizeof(int));
             if (temp == NULL){
                 printf("[FUNC3] Erro na realocação.");
-                exit(1);
+                exit(0);
             }
             result = temp;
             r++;
@@ -268,7 +270,7 @@ int* func3(char *file_bin, char * file_index, char *field, char *value, int prin
             int* temp = realloc(result, (r+2)*sizeof(int));
             if (temp == NULL){
                 printf("[FUNC3] Erro na realocação.");
-                exit(1);
+                exit(0);
             }
             result = temp;
             r++;
@@ -292,7 +294,7 @@ int* func3(char *file_bin, char * file_index, char *field, char *value, int prin
             int* temp = realloc(result, (r+2)*sizeof(int));
             if (temp == NULL){
                 printf("[FUNC3] Erro na realocação.");
-                exit(1);
+                exit(0);
             }
             result = temp;
             r++;
@@ -315,12 +317,12 @@ int func5(char* file_bin, char* file_index, int n){
     FILE *fPessoa = openfile(file_bin, "r+b");
     if(fPessoa == NULL){
         printf("Falha no processamento do arquivo.");
-        exit(1);
+        exit(0);
     }
     FILE *fIndex = openfile(file_index, "r+b");
     if(fPessoa == NULL){
         printf("Falha no processamento do arquivo.");
-        exit(1);
+        exit(0);
     }
 
     fread(&header.status, sizeof(char), 1, fPessoa);
@@ -328,7 +330,7 @@ int func5(char* file_bin, char* file_index, int n){
     fseek(fPessoa, 59, SEEK_CUR);
     if(header.qtdPessoas == 0){
     printf("Registro inexistente.");
-    exit(1);
+    exit(0);
     }
 
     char row[300];
@@ -353,7 +355,7 @@ int func5(char* file_bin, char* file_index, int n){
             for(int k =1; k<=len; k++){
                 if (alteraRegistro(fPessoa, fIndex, RRN[k], field, value) == ERRO){
                     printf("Erro na alteração.");
-                    exit(1);
+                    exit(0);
                 }
             }
         }        

@@ -31,10 +31,6 @@ int main(){
             sscanf(row, "%d %s %s %s %s", &opt, bin, indexa, field, value);
     
             int* result = func3(bin, indexa, field, value,1);
-            int size = result[0];
-            for (int k=1; k<= size; k++){
-                printf("%d ", result[k]);
-            }
             free(result);
             break;
         
