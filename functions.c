@@ -52,7 +52,7 @@ int alteraRegistro(FILE* fp, FILE* fi, int RRN, char* field, char* value){
         int id = atoi(value);
         int pos = buscaBin(fi, id);
         if (pos == -1){
-            printf("Não encontrei");
+            printf("Registro inexistente.");
         }
         //Atualizar o arquivo .index
         fseek(fi, (pos+1)*INDEX_SIZE, SEEK_SET);
@@ -151,7 +151,6 @@ int func1(char* csv, char* file_bin, char* file_index){
         reg->removed = '1';
 
         ind.idPessoa = reg->idPessoa;
-		printf("IDADE_ANTES: %d\n", reg->idade);
         ind.rrn = escreveRegistro(fPessoa, *reg) - 1;
         insereListaOrdenado(list, ind);
         qtdPessoas++;
