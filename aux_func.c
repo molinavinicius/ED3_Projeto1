@@ -108,14 +108,20 @@ int insereListaOrdenado(Lista* list, Index ind){
 }
 
 void writeFilled(FILE* fp, char* str, int SIZE, int lixo){
-    size_t prevlen = strlen(str);
+	
+	char* string = (char*)malloc(SIZE*sizeof(char));
+    strcpy(string,str);
+	size_t prevlen = strlen(string);
+	
     if(lixo == 1) {
-        *(str+prevlen) = '$';
+        *(string+prevlen) = '$';
     }else{
         *(str+prevlen) = '\0';
     }
-    memset(str + prevlen + 1, '$', SIZE - prevlen);
-    fwrite(str, 1, SIZE, fp);
+	
+    memset(string + prevlen + 1, '$', SIZE - prevlen);
+    fwrite(string, 1, SIZE, fp);
+	free(string);
 }
 
 void remove_quotes(char * line){
