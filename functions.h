@@ -25,13 +25,12 @@ typedef struct{
     int rrn;
 }Index;
 
-int buscaBin(FILE* fp, int idPessoa);
-FILE* openfile(char* filename, char* mode);
 void printRegister( Registro registro);
 int readRegister(FILE* fp, Registro *registro);
+int alteraRegistro(FILE* fp, FILE* fi, int RRN, char* field, char* value);
 int func1(char* csv);
 int func2(char *filename);
-int* func3(char *file_bin, char * file_index, char *field, char *value);
+int* func3(char *file_bin, char * file_index, char *field, char *value, int print);
 
 int func5(char* file_bin, char* file_index, int n);
 

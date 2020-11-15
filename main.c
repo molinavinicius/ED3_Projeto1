@@ -30,7 +30,7 @@ int main(){
         case '3':
             sscanf(row, "%d %s %s %s %s", &opt, bin, indexa, field, value);
     
-            int* result = func3(bin, indexa, field, value);
+            int* result = func3(bin, indexa, field, value,1);
             int size = result[0];
             for (int k=1; k<= size; k++){
                 printf("%d ", result[k]);
@@ -39,7 +39,7 @@ int main(){
             break;
         
         case '4':
-            /* code */
+            //code here
             break;
         case '5':
             sscanf(row, "%d %s %s %d", &opt, bin, indexa, &n);

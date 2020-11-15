@@ -1,38 +1,12 @@
-#include<stdio.h>
-#include<string.h>
-#include<stdlib.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+#include <ctype.h>
 #include <strings.h>
 
 #include"functions.h"
+#include "aux_func.h"
 
-
-int buscaBin(FILE* fp, int idPessoa){
-    int left = 1;
-    fseek(fp,0,SEEK_END);
-    int right = ftell(fp)/8;
-    int middle;
-    
-    Registro registro; 
-    int id;
-    int RRN; 
-    while(left < right){
-
-        middle = (left + right)/2;
-        fseek(fp,8*middle, SEEK_SET);
-        fread(&id, sizeof(int), 1,fp);
-        fread(&RRN, sizeof(int), 1,fp);
-
-        if (id == idPessoa){
-            return RRN;
-        }
-        if (idPessoa > id){
-            left = middle;
-        }else{
-            right = middle;
-        }
-    }
-    return -1;    
-}
 
 void printRegister( Registro registro){
     printf("Dados da pessoa de codigo %d\n", registro.idPessoa);
@@ -64,16 +38,6 @@ int readRegister(FILE* fp, Registro *registro){
     }
 }
 
-FILE* openfile(char* filename, char* mode){
-    char *path = (char *)malloc((strlen(filename)+16)*sizeof(char));
-    strcpy(path, "casos-de-teste/");
-    strcat(path, filename); 
-
-    FILE* file = fopen(path, mode);
-
-    free(path);
-    return file;
-}
 
 void changeStatus(FILE* fp, char status){
     int position = ftell(fp);
@@ -81,6 +45,44 @@ void changeStatus(FILE* fp, char status){
     fwrite(&status, sizeof(char), 1, fp);
     fseek(fp, position, SEEK_SET);
     return;
+}
+
+//TODO: adicionar os caracteres de lixo '$'
+int alteraRegistro(FILE* fp, FILE* fi, int RRN, char* field, char* value){
+    printf("\n--- VALORES EM ALTERA_REG ---\n");
+    printf("RRN: %d\n", RRN);
+    printf("FIELD: %s\n", field);
+    printf("VALUE: %s\n", value);
+    if(strcmp(field, "idPessoa")==0){
+        int id = atoi(value);
+        int pos = buscaBin(fi, id);
+        if (pos == -1){
+            printf("Não encontrei");
+        }
+        //Atualizar o arquivo .index
+        fseek(fi, (pos+1)*INDEX_SIZE, SEEK_SET);
+        fwrite(&id, sizeof(int), 1, fi);
+
+        //Atualizar o arquivo .bin
+        fseek(fp, RRN*REG_SIZE + 1, SEEK_SET);//aqui o +1 é para pular o campo de removido
+        fwrite(&id, sizeof(int), 1, fp);
+
+    }else if(strcmp(field, "nomePessoa")==0){
+
+        fseek(fp, RRN*REG_SIZE + 5, SEEK_SET);
+        fwrite(value, sizeof(char), 40, fp);
+
+    }else if(strcmp(field, "idadePessoa")==0){
+        int age = atoi(value);
+
+        fseek(fp, RRN*REG_SIZE + 45, SEEK_SET);
+        fwrite(&age, sizeof(int), 1, fp);
+
+    }else if(strcmp(field, "twitterPessoa")==0){
+        fseek(fp, RRN*REG_SIZE + 49, SEEK_SET);
+        fwrite(value, sizeof(char), 15, fp);
+    }
+    return OK;
 }
 
 int func1(char* csv){
@@ -134,6 +136,10 @@ int func2(char* filename){
     }
 
     fread(&header.status, sizeof(char), 1, fp);
+    if(header.status == '0'){
+        printf("Falha no processamento do arquivo.");
+        return ERRO;
+    }
     fread(&header.qtdPessoas, sizeof(int), 1, fp);
     fseek(fp, 59, SEEK_CUR);
 
@@ -141,7 +147,7 @@ int func2(char* filename){
         printf("Registro inexistente.");
     }
     else{
-        for(int i = 0; i<header.qtdPessoas; i++){
+        for(int i = 0; i<=header.qtdPessoas; i++){
             if(readRegister(fp, &registro)!=-1){
                 printRegister(registro);
             }else{
@@ -154,7 +160,7 @@ int func2(char* filename){
     return 0;
 }
 
-int* func3(char *file_bin, char * file_index, char *field, char *value){
+int* func3(char *file_bin, char * file_index, char *field, char *value, int print){
    /*
    Description: 
 
@@ -200,6 +206,7 @@ int* func3(char *file_bin, char * file_index, char *field, char *value){
   int r = 1;
 
   //BUSCA PELO ID
+  //TODO: verificar se o RRN em idPessoa está correto
   if(strcmp(field, "idPessoa")==0){
     int id = atoi(value);
     int RRN = buscaBin(fIndex, id);
@@ -208,7 +215,9 @@ int* func3(char *file_bin, char * file_index, char *field, char *value){
     }
     else{
         fseek(fPessoa, 64*(RRN+1),SEEK_SET);
-        if(readRegister(fPessoa, &registro)!=-1){
+        RRN = readRegister(fPessoa, &registro);
+        if(RRN != -1){
+            if (print)
             printRegister(registro);
             result[r] = RRN;
             int* temp = realloc(result, (r++)*sizeof(int));
@@ -299,19 +308,62 @@ int* func3(char *file_bin, char * file_index, char *field, char *value){
 }
 
 int func5(char* file_bin, char* file_index, int n){
+
+    Header header;
+    Registro registro;    
+
+    FILE *fPessoa = openfile(file_bin, "r+b");
+    if(fPessoa == NULL){
+        printf("Falha no processamento do arquivo.");
+        exit(1);
+    }
+    FILE *fIndex = openfile(file_index, "r+b");
+    if(fPessoa == NULL){
+        printf("Falha no processamento do arquivo.");
+        exit(1);
+    }
+
+    fread(&header.status, sizeof(char), 1, fPessoa);
+    fread(&header.qtdPessoas, sizeof(int), 1, fPessoa);
+    fseek(fPessoa, 59, SEEK_CUR);
+    if(header.qtdPessoas == 0){
+    printf("Registro inexistente.");
+    exit(1);
+    }
+
     char row[300];
-    char remain[300]
+    char remain[300];
     char field[25];
     char value[40];
     int m;
-    for(int i=0; i<n;i++){
-        strcpy(row,"");
-        scanf("%[^\n]",row);
-        sscanf(row,"%s %s %d %[^\n]", field, value, &m, remain);
-        int* RRN = func3(file_bin,file_index,field,value);
-        for(int j=0; j<m;j++){
 
+    changeStatus(fPessoa, '0');
+    changeStatus(fIndex, '0');
+
+
+    for(int i=0; i<n;i++){
+        scanf("%s", field);
+        scan_quote_string(value);
+        scanf("%d", &m);
+        int* RRN = func3(file_bin,file_index,field,value,0);
+        int len = RRN[0];
+        for(int j=0; j<m;j++){
+            scanf("%s", field);
+            scan_quote_string(value);
+            for(int k =1; k<=len; k++){
+                if (alteraRegistro(fPessoa, fIndex, RRN[k], field, value) == ERRO){
+                    printf("Erro na alteração.");
+                    exit(1);
+                }
+            }
         }        
 
     }
+
+    changeStatus(fPessoa, '1');
+    changeStatus(fIndex, '1');
+    fclose(fPessoa);
+    fclose(fIndex);
+    //binarioNaTela1(file_bin, file_index);
+    return OK;
 }
