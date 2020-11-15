@@ -35,6 +35,39 @@ void escreveLista(FILE* fp,Lista *list){
 	}
 }
 
+void deleteFrom(Lista* list, Index ind){
+    return;
+}
+
+void imprimeLista(Lista *list){
+	Index *no = *list;
+	if(list == NULL)
+		return;
+    printf("ID\tRRN\n------\n");
+	while (no != NULL){
+		printf("%d\t%d\n", no->idPessoa, no->rrn);
+		no = no->prox;
+	}
+}
+
+Lista* read2Lista(FILE* fp){
+    Lista* list = criaLista();
+    Index ind;
+
+    fseek(fp,0,SEEK_END);
+    int end = ftell(fp)/8;
+    fseek(fp, INDEX_SIZE, SEEK_SET);
+
+    for(int i=1;i<end;i++){
+        fread(&ind.idPessoa,sizeof(int),1,fp);
+        fread(&ind.rrn,sizeof(int),1,fp);
+        insereListaOrdenado(list, ind);
+    }
+    return list;
+}
+
+
+
 int insereListaOrdenado(Lista* list, Index ind){
     if(list == NULL)
         return ERRO;

@@ -85,7 +85,7 @@ int escreveRegistro(FILE* fp, Registro reg){
     int rrn = ftell(fp)/REG_SIZE;
     fwrite(&reg.removed,sizeof(char), 1, fp);
     fwrite(&reg.idPessoa, sizeof(int),1,fp);
-    writeFilled(fp,reg.name,NAME_SIZE-1,0);
+    writeFilled(fp,reg.name,NAME_SIZE,0);
     fwrite(&reg.idade, sizeof(int),1,fp);
     writeFilled(fp, reg.twitter, TWITTER_SIZE,0);
     return rrn;
@@ -153,11 +153,10 @@ int func1(char* csv, char* file_bin, char* file_index){
         reg.removed = '1';
 
         ind.idPessoa = reg.idPessoa;
-        ind.rrn = escreveRegistro(fPessoa, reg);
+        ind.rrn = escreveRegistro(fPessoa, reg) - 1;
         insereListaOrdenado(list, ind);
         qtdPessoas++;
     }
-    Index* p = *list; 
     escreveLista(fIndex, list);
     fseek(fPessoa,1,SEEK_SET);
     fwrite(&qtdPessoas,sizeof(int),1,fPessoa);
@@ -360,6 +359,74 @@ int* func3(char *file_bin, char * file_index, char *field, char *value, int prin
   return result;
 }
 
+int func4(char* file_bin, char* file_index, int n){
+    Header header;
+    Registro registro; 
+    Index index;   
+
+    FILE *fPessoa = openfile(file_bin, "r+b");
+    if(fPessoa == NULL){
+        printf("Falha no processamento do arquivo.");
+        exit(0);
+    }
+    FILE *fIndex = openfile(file_index, "w");
+    if(fPessoa == NULL){
+        printf("Falha no processamento do arquivo.");
+        exit(0);
+    }
+
+    Lista* list = read2Lista(fIndex);
+    fread(&header.status, sizeof(char), 1, fPessoa);
+    fread(&header.qtdPessoas, sizeof(int), 1, fPessoa);
+
+    changeStatus(fPessoa, '0');
+    changeStatus(fIndex,'0');
+
+    fseek(fPessoa,0,SEEK_END);
+
+    char buff[10];
+    char buffer[100];
+
+    for(int i=0; i<n;i++){
+        scanf("%d", &registro.idPessoa);
+        scan_quote_string(buffer);
+        if(strlen(buffer)>40){
+            buffer[40] = '\0';
+        }
+        strcpy(registro.name, buffer);
+        scan_quote_string(buff);
+        if(strcmp(buff, "") == 0){
+            registro.idade = -1;
+        }else{
+            registro.idade = atoi(buff);
+        }
+        scan_quote_string(registro.twitter);
+        index.idPessoa = registro.idPessoa;
+        index.rrn = escreveRegistro(fPessoa, registro) - 1;
+        insereListaOrdenado(list, index);
+        header.qtdPessoas++;
+    }
+    
+    fseek(fPessoa,1,SEEK_SET);
+    fwrite(&header.qtdPessoas,sizeof(int),1,fPessoa);
+
+    char lixo[20];
+    strcpy(lixo,"");
+    char statusIndex = '1';
+    fwrite(&statusIndex,1,1,fIndex);
+    writeFilled(fIndex, lixo, 7, 1);
+
+    escreveLista(fIndex, list);
+
+    fclose(fIndex);
+    fclose(fPessoa);
+    liberaLista(list);
+
+    binarioNaTela1("casos-de-teste/caso19-antes.bin", "casos-de-teste/caso19-antes.index");
+
+    return OK;
+}
+
 int func5(char* file_bin, char* file_index, int n){
 
     Header header;
@@ -380,8 +447,8 @@ int func5(char* file_bin, char* file_index, int n){
     fread(&header.qtdPessoas, sizeof(int), 1, fPessoa);
     fseek(fPessoa, 59, SEEK_CUR);
     if(header.qtdPessoas == 0){
-    printf("Registro inexistente.");
-    exit(0);
+        printf("Registro inexistente.");
+        exit(0);
     }
 
     char row[300];

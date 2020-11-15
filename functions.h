@@ -38,7 +38,7 @@ int escreveRegistro(FILE* fp, Registro reg);
 int func1(char* csv, char* file_bin, char* file_index);
 int func2(char *filename);
 int* func3(char *file_bin, char * file_index, char *field, char *value, int print);
-
+int func4(char* file_bin, char* file_index, int n);
 int func5(char* file_bin, char* file_index, int n);
 
 

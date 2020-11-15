@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include"functions.h"
+#include"aux_func.h"
 
 int main(){
 
@@ -35,7 +36,8 @@ int main(){
             break;
         
         case '4':
-            //code here
+            sscanf(row, "%d %s %s %d", &opt, bin, indexa, &n);
+            func4(bin, indexa, n);
             break;
         case '5':
             sscanf(row, "%d %s %s %d", &opt, bin, indexa, &n);
