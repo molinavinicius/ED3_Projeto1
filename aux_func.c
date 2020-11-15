@@ -2,7 +2,6 @@
 #include <string.h>
 #include <stdio.h>
 #include <ctype.h>
-#include <strings.h>
 #include"functions.h"
 #include "aux_func.h"
 
