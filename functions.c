@@ -38,7 +38,6 @@ int readRegister(FILE* fp, Registro *registro){
     }
 }
 
-
 void changeStatus(FILE* fp, char status){
     int position = ftell(fp);
     fseek(fp, 0, SEEK_SET);
@@ -86,7 +85,7 @@ int escreveRegistro(FILE* fp, Registro reg){
     int rrn = ftell(fp)/REG_SIZE;
     fwrite(&reg.removed,sizeof(char), 1, fp);
     fwrite(&reg.idPessoa, sizeof(int),1,fp);
-    writeFilled(fp,reg.name,NAME_SIZE,0);
+    writeFilled(fp,reg.name,NAME_SIZE-1,0);
     fwrite(&reg.idade, sizeof(int),1,fp);
     writeFilled(fp, reg.twitter, TWITTER_SIZE,0);
     return rrn;
