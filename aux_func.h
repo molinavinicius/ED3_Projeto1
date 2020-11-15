@@ -13,6 +13,7 @@ FILE* openfile(char* filename, char* mode);
 void binarioNaTela1(char *nomeArquivoBinario, char *nomeArquivoIndice);
 void scan_quote_string(char *str);
 void writeFilled(FILE* fp, char* str, int SIZE, int lixo);
+void trim(char *str);
 
 void deleteFrom(Lista* list, Index ind);
 Lista* read2Lista(FILE* fp);
