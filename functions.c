@@ -161,6 +161,9 @@ int func1(char* csv, char* file_bin, char* file_index){
     fseek(fPessoa,1,SEEK_SET);
     fwrite(&qtdPessoas,sizeof(int),1,fPessoa);
 
+	changeStatus(fPessoa, '1');
+	changeStatus(fIndex, '1');
+
     fclose(fPessoa);
     fclose(fIndex);
     liberaLista(list);
