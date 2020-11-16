@@ -432,6 +432,8 @@ int func4(char* file_bin, char* file_index, int n){
 
     escreveLista(fIndex, list);
 
+    changeStatus(fPessoa, '1');
+    
     fclose(fIndex);
     fclose(fPessoa);
     liberaLista(list);
