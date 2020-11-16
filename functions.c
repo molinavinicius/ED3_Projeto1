@@ -378,13 +378,22 @@ int func4(char* file_bin, char* file_index, int n){
         printf("Falha no processamento do arquivo.");
         exit(0);
     }
-    FILE *fIndex = openfile(file_index, "w");
-    if(fPessoa == NULL){
+
+    FILE *temp = openfile(file_index, "rb");
+    if(temp == NULL){
         printf("Falha no processamento do arquivo.");
         exit(0);
     }
 
-    Lista* list = read2Lista(fIndex);
+    Lista* list = read2Lista(temp);
+	fclose(temp);
+
+	FILE *fIndex = openfile(file_index, "wb");
+    if(fIndex == NULL){
+        printf("Falha no processamento do arquivo.");
+        exit(0);
+    }
+
     fread(&header.status, sizeof(char), 1, fPessoa);
     fread(&header.qtdPessoas, sizeof(int), 1, fPessoa);
 
@@ -413,10 +422,13 @@ int func4(char* file_bin, char* file_index, int n){
         }else{
             registro.idade = atoi(buff);
         }
+		//Lê o twitter
         scan_quote_string(registro.twitter);
 
+		registro.removed = '1';
+
         index.idPessoa = registro.idPessoa;
-        index.rrn = escreveRegistro(fPessoa, registro) - 1;
+        index.rrn = escreveRegistro(fPessoa, registro);
         insereListaOrdenado(list, index);
         header.qtdPessoas++;
     }
@@ -424,14 +436,19 @@ int func4(char* file_bin, char* file_index, int n){
     fseek(fPessoa,1,SEEK_SET);
     fwrite(&header.qtdPessoas,sizeof(int),1,fPessoa);
 
-    char lixo[20];
+    char lixo[59];
     strcpy(lixo,"");
-    char statusIndex = '1';
+	char statusIndex = '1';
+	rewind(fIndex);
     fwrite(&statusIndex,1,1,fIndex);
     writeFilled(fIndex, lixo, 7, 1);
 
+	imprimeLista(list);
+    
     escreveLista(fIndex, list);
 
+    changeStatus(fPessoa, '1');
+    
     fclose(fIndex);
     fclose(fPessoa);
     liberaLista(list);
